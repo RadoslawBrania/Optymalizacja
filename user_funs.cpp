@@ -32,3 +32,16 @@ matrix df0(double t, matrix Y, matrix ud1, matrix ud2)
 	dY(1) = ((t <= ud2(1))*ud2(0) - m*g*l*sin(Y(0)) - b*Y(1)) / I;
 	return dY;
 }
+
+matrix ff1T(matrix x, matrix ud1, matrix ud2) {
+	matrix y;
+	y = pow(x, 2);
+	return y;
+}
+int GetFib(int n) {
+	if (n <= 1)
+	{
+		return n;
+	}
+	return GetFib(n - 1) + GetFib(n - 2);
+}
