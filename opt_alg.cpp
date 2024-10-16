@@ -87,24 +87,32 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 	try
 	{
 		solution Xopt,Xopt2;
-		
+		if (a > b) {
+			double help = a;
+			a = b;
+			b = help;
+		}
 		double d,c;
-		int k; 
-		k =ceil(b - a / epsilon);
-		c = b - -GetFib(k - 1) / GetFib(k) * (b - a);
+		double k=0; 
+		while (GetFib(k) < (b-a)/epsilon)
+		{	
+			k++;
+		}
+		cout << "a: " << a << " b: " << b << " k : " << k << endl;
+		c = b - GetFib(k - 1) / GetFib(k) * (b - a);
 		d = a + b - c;
-		for (int i = 0; i <= k - 3; i++) {
+		for (int i = 0; i < k - 3; i++) {
 			Xopt.x = c;
 			Xopt2.x = d;
-			Xopt2.fit_fun(ff, ud1, d2);
-			Xopt2.fit_fun(ff, ud1, d2);
-			if (Xopt.y < Xopt.x) {
-				b = c;
+			Xopt.fit_fun(ff, ud1, ud2);
+			Xopt2.fit_fun(ff, ud1, ud2);
+			if (Xopt.y < Xopt2.y) {
+				b = d;
 			}
 			else {
 				a = c;
 			}
-			c = b - -GetFib(k - i - 2) / GetFib(k - i - 1) * (b - a);
+			c = b - GetFib(k - i - 2) / GetFib(k - i - 1) * (b - a);
 			d = a + b - c;
 		}
 		Xopt.x = c;
@@ -124,16 +132,21 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double c, 
 	{
 		solution Xopt,Xopt2,Xopt3;
 		double d=0,dprev;
-		i = 0;
+		int i = 0;
+		Xopt2.flag = 1;
 		do {
 			Xopt.x = a;
 			Xopt2.x = b;
 			Xopt3.x = c;
-			Xopt.fit_fun(ff, ud1, d2);
-			Xopt2.fit_fun(ff, ud1, d2);
-			Xopt3.fit_fun(ff, ud1, d2);
-			l = Xopt.y * (pow(b, 2) - pow(c, 2)) + Xopt2.y * (pow(c, 2) - pow(a, 2)) + Xopt3.y * (pow(a, 2) - pow(b, 2));
-			m = Xopt.y * (b - c) + Xopt2.y * (c - a) + Xopt3.y * (a - b);
+			cout << "a: " << a << " b: " << b << " c: " << c << endl;
+			Xopt.fit_fun(ff, ud1, ud2);
+			Xopt2.fit_fun(ff, ud1, ud2);
+			Xopt3.fit_fun(ff, ud1, ud2);
+			double l = m2d(Xopt.y) * (pow(b, 2) - pow(c, 2)) + 
+					   m2d(Xopt2.y) * (pow(c, 2) - pow(a, 2)) + 
+					   m2d(Xopt3.y) * (pow(a, 2) - pow(b, 2));
+			double m = m2d(Xopt.y) * (b - c) + m2d(Xopt2.y) * (c - a) + m2d(Xopt3.y) * (a - b);
+			cout << "licznik: " << l << " mianownik: " << m << endl;
 			if (m <= 0) {
 				Xopt.flag = 0;
 				return 0;
@@ -141,8 +154,8 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double c, 
 			dprev = d;
 			d = 0.5 * l / m;
 			Xopt2.x = d;
-			Xopt2.x.fit_fun(ff, ud1, ud2);
-			if (a < d < c) {
+			Xopt2.fit_fun(ff, ud1, ud2);
+			if (a < d && d < c) {
 				if (Xopt2.y < Xopt3.y) {
 					c = d;
 					b = c;
@@ -151,7 +164,7 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double c, 
 					a = d;
 				}
 			}
-			else if (c<d<b){
+			else if (c < d < b) {
 				if (Xopt2.y < Xopt3.y) {
 					c = d;
 					b = c;
@@ -162,11 +175,10 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double c, 
 			}
 			i++;
 			if (solution::f_calls > Nmax) {
-				X0.flag = 0;
+				Xopt.flag = 0;
 				return 0;
 			}
-			while (b - a < epsilon | abs(Xopt2.x - dprev)) < gamma)
-		}
+		} while (b - a < epsilon || fabs(m2d(Xopt2.x) - dprev) < gamma);
 		return Xopt2;
 	}
 	catch (string ex_info)

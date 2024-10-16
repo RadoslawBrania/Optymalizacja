@@ -68,10 +68,22 @@ void lab0()
 
 void lab1()
 {
-	double x0 = -4, alpha = 2, d = 1;
 	int Nmax = 1000;
-	double* p = expansion(ff1T, x0, d, alpha, Nmax);
-	cout << p[0] << p[1];
+	double epsilon = 0.000001;
+	for (int i = 0; i < 3; i++) {
+		int alpha = i+2;
+		for (int k = 0; k < 100; k++) {
+			int x0 = (rand() % 200) - 100;
+			int d = (rand() % 200) - 100;
+			double* p = expansion(ff1T, x0, d, alpha, Nmax);
+			solution::clear_calls();
+			if (p[0] == p[1]) p[1]++;
+			solution Sol = fib(ff1T, p[0], p[1], epsilon, matrix(), matrix());
+			solution::clear_calls();
+			Sol = lag(ff1T, p[0], p[1], (p[0] + p[1] / 2),epsilon,epsilon*100,Nmax, matrix(), matrix());
+			cout << m2d(Sol.x) << Sol.flag << endl;
+		}
+	}
 }
 
 void lab2()

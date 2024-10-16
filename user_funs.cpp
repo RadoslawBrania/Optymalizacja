@@ -38,10 +38,13 @@ matrix ff1T(matrix x, matrix ud1, matrix ud2) {
 	y = pow(x, 2);
 	return y;
 }
-int GetFib(int n) {
-	if (n <= 1)
-	{
-		return n;
+double GetFib(int n) {
+	int a = 0, b = 1;
+	int res = 0;
+	for (int i = 0; i < n; i++) {
+		res = a + b;
+		a = b;
+		b = res;
 	}
-	return GetFib(n - 1) + GetFib(n - 2);
+	return res;
 }
