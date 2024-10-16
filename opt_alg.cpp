@@ -86,13 +86,29 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 {
 	try
 	{
-		solution Xopt;
+		solution Xopt,Xopt2;
+		
 		double d,c;
 		int k; 
 		k =ceil(b - a / epsilon);
 		c = b - -GetFib(k - 1) / GetFib(k) * (b - a);
 		d = a + b - c;
-
+		for (int i = 0; i <= k - 3; i++) {
+			Xopt.x = c;
+			Xopt2.x = d;
+			Xopt2.fit_fun(ff, ud1, d2);
+			Xopt2.fit_fun(ff, ud1, d2);
+			if (Xopt.y < Xopt.x) {
+				b = c;
+			}
+			else {
+				a = c;
+			}
+			c = b - -GetFib(k - i - 2) / GetFib(k - i - 1) * (b - a);
+			d = a + b - c;
+		}
+		Xopt.x = c;
+		Xopt.fit_fun(ff, ud1, ud2);
 		return Xopt;
 	}
 	catch (string ex_info)
@@ -102,14 +118,56 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 
 }
 
-solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double epsilon, double gamma, int Nmax, matrix ud1, matrix ud2)
+solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double c, double epsilon, double gamma, int Nmax, matrix ud1, matrix ud2)
 {
 	try
 	{
-		solution Xopt;
-		//Tu wpisz kod funkcji
-
-		return Xopt;
+		solution Xopt,Xopt2,Xopt3;
+		double d=0,dprev;
+		i = 0;
+		do {
+			Xopt.x = a;
+			Xopt2.x = b;
+			Xopt3.x = c;
+			Xopt.fit_fun(ff, ud1, d2);
+			Xopt2.fit_fun(ff, ud1, d2);
+			Xopt3.fit_fun(ff, ud1, d2);
+			l = Xopt.y * (pow(b, 2) - pow(c, 2)) + Xopt2.y * (pow(c, 2) - pow(a, 2)) + Xopt3.y * (pow(a, 2) - pow(b, 2));
+			m = Xopt.y * (b - c) + Xopt2.y * (c - a) + Xopt3.y * (a - b);
+			if (m <= 0) {
+				Xopt.flag = 0;
+				return 0;
+			}
+			dprev = d;
+			d = 0.5 * l / m;
+			Xopt2.x = d;
+			Xopt2.x.fit_fun(ff, ud1, ud2);
+			if (a < d < c) {
+				if (Xopt2.y < Xopt3.y) {
+					c = d;
+					b = c;
+				}
+				else {
+					a = d;
+				}
+			}
+			else if (c<d<b){
+				if (Xopt2.y < Xopt3.y) {
+					c = d;
+					b = c;
+				}
+				else {
+					b = d;
+				}
+			}
+			i++;
+			if (solution::f_calls > Nmax) {
+				X0.flag = 0;
+				return 0;
+			}
+			while (b - a < epsilon | abs(Xopt2.x - dprev)) < gamma)
+		}
+		return Xopt2;
 	}
 	catch (string ex_info)
 	{
